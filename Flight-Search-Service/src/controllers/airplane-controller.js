@@ -33,11 +33,51 @@ async function getAllAirplanes(req, res){
        return res.status(statusCode).json(errorResponse);
     }};
 
+    /** 
+    * GET : /airplanes/:id
+    * req body : {}
+    **/
+async function getAirplane(req, res){
+    try{
+      const airplane= await airplaneService.getAirplane(req.params.id);
+      successResponse.data=airplane;
+      return res.status(StatusCodes.OK).json(successResponse);
+    }catch(error){
+      errorResponse.error=error;
+      const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+       return res.status(statusCode).json(errorResponse);
+    }};
+
+async function destroyAirplane(req, res){
+    try{
+      const airplane= await airplaneService.destroyAirplane(req.params.id);
+      successResponse.data=airplane;
+      return res.status(StatusCodes.OK).json(successResponse);
+    }catch(error){
+      errorResponse.error=error;
+      const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+       return res.status(statusCode).json(errorResponse);
+    }};
+
+    async function updateAirplane(req, res){
+      try{
+         const response= await airplaneService.updateAirplane(req.params.id, req.body);
+         successResponse.data=response;
+         return res.status(StatusCodes.OK).json(successResponse);
+      }catch(err){
+         errorResponse.error=err;
+         const statusCode=err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+         return res.status(statusCode).json(errorResponse); 
+      }
+    }
 
 
 module.exports={
     createAirplane,
-    getAllAirplanes
+    getAllAirplanes,
+    getAirplane,
+    destroyAirplane,
+    updateAirplane
 };
 
 

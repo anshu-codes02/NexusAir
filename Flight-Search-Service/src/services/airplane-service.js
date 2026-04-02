@@ -37,8 +37,53 @@ async function getAllAirplanes(){
     } catch(err){
         throw new AppError('Unable to fetch data', StatusCodes.INTERNAL_SERVER_ERROR);
     }
-}
+};
+
+async function getAirplane(id){
+    try{
+        const response=await airplanerepo.get(id);
+        return response;
+    } catch(err){
+        if(err.statusCode==StatusCodes.NOT_FOUND)
+        {
+            throw new AppError('id not exist',err.statusCode);
+        }
+        throw new AppError('Unable to fetch data', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+};
+
+async function destroyAirplane(id){
+    try{
+        const response=await airplanerepo.destroy(id);
+        return response;
+    } catch(err){
+        if(err.statusCode==StatusCodes.NOT_FOUND)
+        {
+            throw err;
+        }
+        throw new AppError('Unable to destroy data', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+};
+
+async function updateAirplane(id, data){
+    try{
+         const response= await airplanerepo.update(data, id);
+         return response;
+    } catch(err){
+          if(err.statusCode==StatusCodes.NOT_FOUND)
+        {
+            throw err;
+        }
+        throw new AppError('Unable to destroy data', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+};
+
+
+
 module.exports={
     createAirplane,
-    getAllAirplanes
+    getAllAirplanes,
+    getAirplane,
+    destroyAirplane,
+    updateAirplane
 }

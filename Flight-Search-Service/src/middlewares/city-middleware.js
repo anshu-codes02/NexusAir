@@ -4,14 +4,15 @@ const AppError=require('../utils/errors/app-error');
 
 function validateCreateRequest(req, res, next){
     
-        if(!req.body.modelNumber){
+        if(!req.body.name){
           errorResponse.message='something went wrong';
-          errorResponse.error=new AppError(['model number not found in the request'], StatusCodes.BAD_REQUEST);
+          errorResponse.error=new AppError(['name not found in the request'], StatusCodes.BAD_REQUEST);
 
           return res.status(StatusCodes.BAD_REQUEST).json(errorResponse);
         }
         next();
 }
+
 
 function validateUpdate(req, res, next){
    if(!req.body)
@@ -23,7 +24,7 @@ function validateUpdate(req, res, next){
    next();
 }
 
-module.exports=
-{validateCreateRequest,
- validateUpdate
-};
+module.exports={
+    validateCreateRequest,
+    validateUpdate
+}

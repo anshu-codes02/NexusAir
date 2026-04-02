@@ -20,12 +20,21 @@ class crudRepository {
                     id: data
                 }
             });
+
+            if(response==0){
+                throw new AppError('Not found', StatusCodes.NOT_FOUND);
+            }
+
             return response;
     };
 
     async get(data){
        
             const response= await this.model.findByPk(data);
+            if(!response){
+                throw new AppError('Not found', StatusCodes.NOT_FOUND);
+            }
+
             return response;
     };
 
@@ -34,11 +43,15 @@ class crudRepository {
             return response;
     };
 
-     async updateAll(data, id){
+     async update(data, id){
             const response= await this.model.update(data, {where: {
                 id: id
             }
         });
+
+         if(response==0){
+                throw new AppError('Not found', StatusCodes.NOT_FOUND);
+            }
             return response;
     };
 

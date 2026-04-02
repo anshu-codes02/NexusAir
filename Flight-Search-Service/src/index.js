@@ -8,6 +8,5 @@ app.use(express.urlencoded({extended: true}));
 app.use('/api', apiRoutes);
 
 app.listen(serverConfig.PORT, ()=>{
-    console.log(process.env.PORT)
     console.log("server is running");
 });
