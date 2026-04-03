@@ -39,7 +39,9 @@ class crudRepository {
     };
 
     async getAll(){
+        console.log('inside repo');
             const response= await this.model.findAll();
+            console.log(response);
             return response;
     };
 

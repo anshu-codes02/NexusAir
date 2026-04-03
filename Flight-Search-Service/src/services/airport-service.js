@@ -1,46 +1,37 @@
-const { StatusCodes } = require('http-status-codes');
-const {AirplaneRepository}=require('../repositories');
-const AppError = require('../utils/errors/app-error');
+const {AirportRepository} = require('../repositories');
+const {AppError} = require('../utils/errors/app-error');
+const {StatusCodes} = require('http-status-codes');
 
-const airplanerepo=new AirplaneRepository();
+const airportRepo=new AirportRepository();
 
-
-async function createAirplane(data){
-    try {
-        const response=await airplanerepo.create(data);
+async function createAirport(data){
+    try{
+        const response= await airportRepo.create(data);
         return response;
-    } catch (error) {
-        
-        if(error.name=='SequelizeDatabaseError'){
+    }catch(error){
+        console.log(error);
+          if(error.name=='SequelizeDatabaseError'){
             const message=error.parent.sqlMessage;
             throw new AppError(message, StatusCodes.BAD_REQUEST);
         }
          if(error.name=='TypeError'){
             throw new AppError("typeError", StatusCodes.INTERNAL_SERVER_ERROR);
         }
-        if(error.name=='SequelizeValidationError'){
+        if(error.name=='SequelizeValidationError' || error.name=='SequelizeUniqueConstraintError'){
             const message=[];
             error.errors.forEach((err)=>{
                 message.push(err.message);
             });
             throw new AppError(message, StatusCodes.BAD_REQUEST);
         }
-        throw error;
+        throw new AppError(['Something went wrong'], StatusCodes.INTERNAL_SERVER_ERROR);
+  
     }
 }
 
-async function getAllAirplanes(){
+async function getAirport(id){
     try{
-        const response=await airplanerepo.getAll();
-        return response;
-    } catch(err){
-        throw new AppError('Unable to fetch data', StatusCodes.INTERNAL_SERVER_ERROR);
-    }
-};
-
-async function getAirplane(id){
-    try{
-        const response=await airplanerepo.get(id);
+        const response=await airportRepo.get(id);
         return response;
     } catch(err){
         if(err.statusCode==StatusCodes.NOT_FOUND)
@@ -51,9 +42,21 @@ async function getAirplane(id){
     }
 };
 
-async function destroyAirplane(id){
+async function getAllAirports(){
     try{
-        const response=await airplanerepo.destroy(id);
+        console.log('inside service');
+        const response=await airportRepo.getAll();
+        console.log(response);
+        return response;
+    } catch(err){
+        console.log(err);
+        throw new AppError('Unable to fetch data', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+};
+
+async function destroyAirport(id){
+    try{
+        const response=await airportRepo.destroy(id);
         return response;
     } catch(err){
         if(err.statusCode==StatusCodes.NOT_FOUND)
@@ -64,9 +67,9 @@ async function destroyAirplane(id){
     }
 };
 
-async function updateAirplane(id, data){
+async function updateAirport(id, data){
     try{
-         const response= await airplanerepo.update(data, id);
+         const response= await airportRepo.update(data, id);
          return response;
     } catch(err){
           if(err.statusCode==StatusCodes.NOT_FOUND)
@@ -77,12 +80,10 @@ async function updateAirplane(id, data){
     }
 };
 
-
-
 module.exports={
-    createAirplane,
-    getAllAirplanes,
-    getAirplane,
-    destroyAirplane,
-    updateAirplane
+    createAirport,
+    getAirport,
+    getAllAirports,
+    destroyAirport,
+    updateAirport
 }
