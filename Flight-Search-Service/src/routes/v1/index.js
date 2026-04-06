@@ -6,5 +6,6 @@ router.get('/info', infoController.info);
 router.use('/airplane', require('./airplane-routes'));
 router.use('/city', require('./city-routes'));
 router.use('/airport', require('./airport-routes'));
+router.use('/flight', require('./flight-routes'));
 
 module.exports=router;

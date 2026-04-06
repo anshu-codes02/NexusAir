@@ -9,7 +9,7 @@ async function createAirport(data){
         const response= await airportRepo.create(data);
         return response;
     }catch(error){
-        console.log(error);
+        
           if(error.name=='SequelizeDatabaseError'){
             const message=error.parent.sqlMessage;
             throw new AppError(message, StatusCodes.BAD_REQUEST);
@@ -44,12 +44,11 @@ async function getAirport(id){
 
 async function getAllAirports(){
     try{
-        console.log('inside service');
+        
         const response=await airportRepo.getAll();
-        console.log(response);
+       
         return response;
     } catch(err){
-        console.log(err);
         throw new AppError('Unable to fetch data', StatusCodes.INTERNAL_SERVER_ERROR);
     }
 };
