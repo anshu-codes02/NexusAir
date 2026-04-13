@@ -39,6 +39,16 @@ async function validateCreateFlight(req, res, next){
     next();
 }
 
+
+async function validateUpdateSeats(req, res, next){
+    if(!req.body.seats){
+        errorResponse.error=new AppError('Seats not found', StatusCodes.BAD_REQUEST);
+        return res.status(StatusCodes.BAD_REQUEST).json(errorResponse);
+    }
+    next();
+}
+
 module.exports={
-    validateCreateFlight
+    validateCreateFlight,
+    validateUpdateSeats
 }
