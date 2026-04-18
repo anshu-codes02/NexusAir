@@ -1,15 +1,16 @@
 const { StatusCodes } = require('http-status-codes');
 const AppError=require('../utils/error/app-error');
-
+const db=require('../models');
 class crudRepository {
 
     constructor(model){
         this.model=model;
     }
     
-    async create(data){
-        
-            const response= await this.model.create(data);
+    async create(data, t){
+            const response= await this.model.create(data,{
+                transaction: t
+            });
             return response;
     };
 

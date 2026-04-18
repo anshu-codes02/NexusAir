@@ -1,16 +1,31 @@
 const AppError = require('../utils/error/app-error');
-const { UserRepository } = require('../repositories');
+const { UserRepository, RoleRepository } = require('../repositories');
 const { StatusCodes } = require('http-status-codes');
 const bcrypt = require('bcrypt');
 const {auth}=require('../utils/common');
+const {enums}= require('../utils/common');
+const db=require('../models');
+const { error } = require('../utils/common/error-response');
 
 const userRepo = new UserRepository();
+const roleRepo= new RoleRepository();
 
 async function signUp(data) {
+    const t = await db.sequelize.transaction();
     try {
-        const response = await userRepo.create(data);
+        const response = await userRepo.create(data, t);
+        console.log(response);
+        const role=await roleRepo.getRoleByName(enums.ROLES.CUSTOMER);
+        console.log(response.id);
+        console.log(role.id);
+        await response.addRole(role, { transaction: t });
+        
+        await t.commit();
         return response;
     } catch (error) {
+        
+        await t.rollback();
+
         if (error instanceof AppError) {
             throw error;
         }
@@ -81,7 +96,48 @@ async function isAuthenticated(token){
     if(error.name=='JsonWebTokenError'){
          throw new AppError('invalid token', StatusCodes.BAD_REQUEST);
     }
+    if(error.name=='TokenExpiredError'){
+         throw new AppError('Token expired', StatusCodes.BAD_REQUEST);
+    }
     throw new AppError('unable to Authenticate', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+async function addRoleToUser(data){
+    try{
+       const user= await userRepo.get(data.userId);
+
+       if(!user){
+        throw new AppError('user not found', StatusCodes.NOT_FOUND);
+       }
+       const role=await roleRepo.getRoleByName(data.roleName);
+       if(!role){
+        throw new AppError('role not found', StatusCodes.NOT_FOUND);
+       }
+       await user.addRole(role);
+    }catch(error){
+        if(error instanceof AppError){
+            return error;
+        }
+        throw new AppError('Something went wrong', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+async function isAdmin(id){
+    try{
+       const user=await userRepo.get(id);
+       if(!user){
+        throw new AppError('user not found', StatusCodes.NOT_FOUND);
+       }
+       const adminrole=await roleRepo.getRoleByName(enums.ROLES.ADMIN);
+       return user.hasRole(adminrole);
+    }catch{
+       if(error instanceof AppError)
+       {
+        throw error;
+       }
+
+       throw new AppError('Something went wrong', StatusCodes.INTERNAL_SERVER_ERROR);
     }
 }
 
@@ -90,5 +146,7 @@ async function isAuthenticated(token){
 module.exports = {
     signUp,
     signIn,
-    isAuthenticated
+    isAuthenticated,
+    addRoleToUser,
+    isAdmin
 }

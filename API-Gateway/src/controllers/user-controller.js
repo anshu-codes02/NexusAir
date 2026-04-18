@@ -27,7 +27,21 @@ async function signIn(req, res){
 };
 
 
+async function addRoleToUser(req, res) {
+    try{
+        const response=await userService.addRoleToUser(req.body);
+        SuccessResponse.data=response;
+        return res.status(StatusCodes.CREATED).json(SuccessResponse);
+    }catch(error){
+         ErrorResponse.error=error;
+         const statusCode=error.statusCode?error.statusCode:StatusCodes.INTERNAL_SERVER_ERROR;
+         return res.status(statusCode).json(ErrorResponse);
+    }
+}
+
+
 module.exports={
     signUp,
-    signIn
+    signIn,
+    addRoleToUser
 }
