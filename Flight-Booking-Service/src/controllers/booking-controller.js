@@ -2,7 +2,7 @@ const {BookingService}=require('../services');
 const {StatusCodes}=require('http-status-codes');
 const {SuccessResponse, ErrorResponse}=require('../utils/common');
 
-inMemoryStore=new Map();
+let inMemoryStore=new Map();
 
 async function createBooking(req, res){
     try{
@@ -29,13 +29,14 @@ async function makePayment(req, res){
             bookingId: req.body.bookingId,
             totalCost: req.body.totalCost,
             userId: req.body.userId
-        });
+        }, req.headers['x-user-email']);
 
         SuccessResponse.data=data;
         SuccessResponse.message="Payment successful";
         inMemoryStore.set(idempotentKey, true);
         return res.status(StatusCodes.OK).json(SuccessResponse);
     }catch(error){
+        console.log(error);
         const statusCode=error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
         ErrorResponse.error=error;
         return res.status(statusCode).json(ErrorResponse);

@@ -3,7 +3,7 @@ const AppError = require('../utils/errors/app-error');
 const { StatusCodes } = require('http-status-codes');
 const axios = require('axios');
 const db = require('../models');
-const { serverConfig } = require('../config');
+const { serverConfig, queueConfig } = require('../config');
 const { Enums } = require('../utils/common');
 const { BOOKED, CANCELLED } = Enums.BOOKING_STATUS;
 
@@ -24,13 +24,12 @@ async function createBooking(data) {
         const result = await bookingrepo.createBooking(bookingPayload, t);
 
         await axios.patch(`${serverConfig.FLIGHT_SERVICE_URL}/api/v1/flight/updateSeats/${data.flightId}`, {
-            seats: data.noOfSeats
+            seats: data.noOfSeats, dec: true
         });
-
         await t.commit();
         return result;
     } catch (error) {
-       
+       console.log(error);
         await t.rollback();
         if (error instanceof AppError) {
             throw error;
@@ -53,7 +52,8 @@ async function createBooking(data) {
     }
 };
 
-async function makePayment(data) {
+async function makePayment(data, email) {
+    console.log("service working")
     const t = await db.sequelize.transaction();
     try {
         const booking = await bookingrepo.get(data.bookingId, t);
@@ -77,8 +77,15 @@ async function makePayment(data) {
         const response = await bookingrepo.update(data.bookingId, { status: BOOKED }, t);
        
         await t.commit();
+       console.log(email);
+        queueConfig.sendData({
+            recepientEmail: email,
+            subject: 'Booking Successful',
+            text: `you seat is booked in the flight with id ${booking.flightId}`
+        });
         return response;
     } catch (error) {
+        console.log(error);
         if(!t.finished) await t.rollback();
             if (error instanceof AppError) {
                 throw error;

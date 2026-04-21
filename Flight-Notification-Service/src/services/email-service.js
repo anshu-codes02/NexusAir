@@ -1,4 +1,4 @@
-const {mailer}=require('../config');
+const mailer=require('../config/mail_config');
 const AppError= require('../utils/errors/app-error');
 const {StatusCodes}= require('http-status-codes');
 const {TicketRepository}=require('../repositories');

@@ -87,7 +87,7 @@ async function isAuthenticated(token){
         throw new AppError('user not found', StatusCodes.NOT_FOUND);
        }
 
-       return user.id;
+       return decoded;
     }catch(error){
        if(error instanceof AppError)
     {

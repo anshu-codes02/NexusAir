@@ -1,4 +1,5 @@
 module.exports={
     serverConfig: require("./server-config"),
-    mailer: require('./mail_config')
+    mailer: require('./mail_config'),
+    queueConfig: require('./queue-config')
 }

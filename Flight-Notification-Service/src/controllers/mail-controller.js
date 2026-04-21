@@ -15,6 +15,19 @@ async function sendEmail(req, res){
     }
 };
 
+async function createTicket(req, res){
+    try{
+       const response=await mailService.createTicket(req.body);
+       successResponse.data=response;
+       return res.status(StatusCodes.CREATED).json(successResponse);
+    }catch(error){
+        errorResponse.error=error;
+       const statusCode=error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+       return res.status(statusCode).json(errorResponse);
+    }
+};
+
 module.exports={
-    sendEmail
+    sendEmail,
+    createTicket
 };

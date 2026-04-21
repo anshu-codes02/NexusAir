@@ -7,9 +7,12 @@ async function isauthenticate(req, res, next){
     try{
     const token =req.headers['bearer-token'];
     const decode=await userService.isAuthenticated(token);
-    req.userId=decode;
+    req.headers['x-user-email'] = decode.email;
+    req.headers['x-user-id'] = decode.id;
+    
     next();
     }catch(error){
+        
       ErrorResponse.error=error;
       const status=error.StatusCode || StatusCodes.INTERNAL_SERVER_ERROR;
      return res.status(status).json(ErrorResponse); 
